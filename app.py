@@ -16,7 +16,7 @@ def get_user():
     user_id = request.args.get("id")
     conn = sqlite3.connect("app.db")
     cur = conn.cursor()
-    cur.execute(f"SELECT * FROM users WHERE id = '{user_id}'")
+    cur.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     return str(cur.fetchall())
 
 
@@ -24,7 +24,9 @@ def get_user():
 def ping():
     # Command injection: user input reaches the shell.
     host = request.args.get("host")
-    return subprocess.check_output("ping -c 1 " + host, shell=True)
+    if not host or not host.replace(".", "").replace("-", "").isalnum():
+        return "invalid host", 400
+    return subprocess.check_output(["ping", "-c", "1", host])
 
 
 @app.route("/hash")
