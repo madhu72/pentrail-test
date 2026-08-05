@@ -9,13 +9,21 @@ provider's token format and none authenticates against any system.
 
 Each branch is a stage. Scan them in order and compare:
 
-| Branch | Stage |
-|---|---|
-| `main` / `v1.0-vulnerable` | Initial project, multiple vulnerabilities |
-| `v1.1-secrets-fixed`       | Hardcoded credentials removed |
-| `v1.2-injection-fixed`     | SQL and command injection fixed |
-| `v1.3-crypto-hardened`     | Weak crypto, `eval`, container and IaC hardening |
-| `v2.0-secure`              | Dependencies patched, debug disabled |
+| Branch | Stage | Findings | Risk |
+|---|---|---|---|
+| `main` / `v1.0-vulnerable` | Initial project, multiple vulnerabilities | 63 | F (100) |
+| `v1.1-secrets-fixed` | Hardcoded credentials and committed key removed | 54 | D (100) |
+| `v1.2-injection-fixed` | SQL and command injection fixed; urllib3 + PyYAML patched | 39 | D (96) |
+| `v1.3-crypto-hardened` | Strong hashing, no `eval`, non-root container, bucket hardened; Flask + requests patched | 20 | D (73) |
+| `v2.0-secure` | Last dependency patched, infrastructure closed, debug disabled | 0 | A (0) |
+
+Dependency upgrades are deliberately spread across v1.2, v1.3 and v2.0 rather than
+landing all at once. Applied only at the end, they pinned every earlier stage near a
+maximum score and made the remediation work in v1.1 and v1.2 invisible in the numbers.
+
+Counts were measured with the full engine profile (semgrep, bandit, gosec, trivy,
+checkov, kics, hadolint, gitleaks) on 2026-08-05. They drift as new CVEs are published
+against the pinned versions — that is the dependency lane working, not a broken fixture.
 
 Expect risk score, finding counts, severity mix and compliance posture to
 improve measurably at each step.
