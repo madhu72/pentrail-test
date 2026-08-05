@@ -16,7 +16,7 @@ def get_user():
     user_id = request.args.get("id")
     conn = sqlite3.connect("app.db")
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE id = '" + user_id + "'")
+    cur.execute(f"SELECT * FROM users WHERE id = '{user_id}'")
     return str(cur.fetchall())
 
 
