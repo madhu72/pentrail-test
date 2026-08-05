@@ -4,4 +4,4 @@ import os
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 API_TOKEN = os.environ.get("API_TOKEN")
 SESSION_SECRET = os.environ.get("SESSION_SECRET")
-DEBUG = True
+DEBUG = False
