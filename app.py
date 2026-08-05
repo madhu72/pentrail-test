@@ -31,15 +31,21 @@ def ping():
 
 @app.route("/hash")
 def hash_password():
-    # Weak hashing for credentials.
+    # v1.3: PBKDF2 with a per-call salt instead of bare MD5.
     pw = request.args.get("pw", "")
-    return hashlib.md5(pw.encode()).hexdigest()
+    salt = os.urandom(16)
+    return hashlib.pbkdf2_hmac("sha256", pw.encode(), salt, 200_000).hex()
 
 
 @app.route("/calc")
 def calc():
-    # Arbitrary code execution.
-    return str(eval(request.args.get("expr", "0")))
+    # v1.3: literal evaluation only — no arbitrary code execution.
+    import ast
+
+    try:
+        return str(ast.literal_eval(request.args.get("expr", "0")))
+    except (ValueError, SyntaxError):
+        return "invalid expression", 400
 
 
 if __name__ == "__main__":
